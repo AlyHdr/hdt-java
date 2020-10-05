@@ -6,7 +6,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
 
+import org.rdfhdt.hdt.dictionary.DictionaryFactory;
 import org.rdfhdt.hdt.enums.RDFNotation;
+import org.rdfhdt.hdt.exceptions.IllegalFormatException;
 import org.rdfhdt.hdt.exceptions.NotFoundException;
 import org.rdfhdt.hdt.exceptions.ParserException;
 import org.rdfhdt.hdt.hdt.impl.HDTImpl;
@@ -61,8 +63,8 @@ public class HDTManagerImpl extends HDTManager {
 
 
 	@Override
-	protected HDT doMapIndexedHDT(String hdtFileName, ProgressListener listener) throws IOException {
-		HDTPrivate hdt = new HDTImpl(new HDTSpecification());
+	protected HDT doMapIndexedHDT(String hdtFileName, ProgressListener listener,HDTOptions spec) throws IOException {
+		HDTPrivate hdt = new HDTImpl(spec);
 		hdt.mapFromHDT(new File(hdtFileName), 0, listener);
 		hdt.loadOrCreateIndex(listener);
 		return hdt;
@@ -90,6 +92,9 @@ public class HDTManagerImpl extends HDTManager {
 		if ("two-pass".equals(loaderType)) {
 			loader = new TempHDTImporterTwoPass();
 		} else {
+			if(spec.get("dictionary.type") != null && spec.get("dictionary.type").equals(DictionaryFactory.DICTIONARY_TYPE_MULTI_OBJECTS)){
+				throw new IllegalFormatException("Could generate HDT file using (one-pass) when using a "+spec.get("dictionary.type")+" dictionary -- pass 'loader.type=two-pass' as an option");
+			}
 			loader = new TempHDTImporterOnePass();
 		}
 		

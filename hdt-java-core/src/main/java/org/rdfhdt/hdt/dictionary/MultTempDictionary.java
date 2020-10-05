@@ -35,69 +35,67 @@ import org.rdfhdt.hdt.triples.TempTriples;
 
 /**
  * Interface that specifies the methods for a dictionary that can be modified.
- * 
+ *
  * @author Eugen
  *
  */
-public interface TempDictionary extends Closeable {
-	
-	TempDictionarySection getSubjects();
-	
-	TempDictionarySection getPredicates();
-	
-	TempDictionarySection getObjects();
+public interface MultTempDictionary extends Closeable {
 
-	HashMap<String,TempDictionarySection> getAllObjects();
+    TempDictionarySection getSubjects();
 
-	TempDictionarySection getShared();
-	
-	/**
-	 * To be executed at the start of the processing
-	 * 
-	 */
-	void startProcessing();
-	
-	/**
-	 * To be executed at the end of the processing
-	 * 
-	 */
-	void endProcessing();
+    TempDictionarySection getPredicates();
 
-	/**
-	 * Inserts a string in the dictionary in a position
-	 * 
-	 * @param str
-	 *            The string to be inserted
-	 * @param position
-	 *            TriplePosition to be inserted in
-	 */
-	long insert(CharSequence str, TripleComponentRole position);
+    HashMap<String,TempDictionarySection> getObjects();
 
-	/**
-	 * Reorganizes the dictionary (Extract shared SO, sort sections).
-	 * (used for two-pass way of work).
-	 * 
-	 */
-	void reorganize();
-	
-	/**
-	 * Reorganizes the dictionary (Extract shared SO, sort sections)
-	 * and updates the IDs of the triples (used for one-pass way of work).
-	 */
-	void reorganize(TempTriples triples);
-	
-	boolean isOrganized();
-	
-	/**
-	 * Empty all the strings of the dictionary.
-	 */
-	void clear();
+    TempDictionarySection getShared();
 
-	/**
-	 * Get the ID of a given String
-	 * @param subject
-	 * @param role
-	 * @return
-	 */
-	public long stringToId(CharSequence subject, TripleComponentRole role);
+    /**
+     * To be executed at the start of the processing
+     *
+     */
+    void startProcessing();
+
+    /**
+     * To be executed at the end of the processing
+     *
+     */
+    void endProcessing();
+
+    /**
+     * Inserts a string in the dictionary in a position
+     *
+     * @param str
+     *            The string to be inserted
+     * @param position
+     *            TriplePosition to be inserted in
+     */
+    long insert(CharSequence str, TripleComponentRole position);
+
+    /**
+     * Reorganizes the dictionary (Extract shared SO, sort sections).
+     * (used for two-pass way of work).
+     *
+     */
+    void reorganize();
+
+    /**
+     * Reorganizes the dictionary (Extract shared SO, sort sections)
+     * and updates the IDs of the triples (used for one-pass way of work).
+     */
+    void reorganize(TempTriples triples);
+
+    boolean isOrganized();
+
+    /**
+     * Empty all the strings of the dictionary.
+     */
+    void clear();
+
+    /**
+     * Get the ID of a given String
+     * @param subject
+     * @param role
+     * @return
+     */
+    public long stringToId(CharSequence subject, TripleComponentRole role);
 }

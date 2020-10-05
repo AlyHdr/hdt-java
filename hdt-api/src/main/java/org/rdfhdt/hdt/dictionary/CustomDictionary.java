@@ -27,11 +27,11 @@ package org.rdfhdt.hdt.dictionary;
  */
 
 
-import java.io.Closeable;
-import java.util.HashMap;
-
 import org.rdfhdt.hdt.enums.TripleComponentRole;
 import org.rdfhdt.hdt.header.Header;
+
+import java.io.Closeable;
+import java.util.HashMap;
 
 
 /**
@@ -40,7 +40,7 @@ import org.rdfhdt.hdt.header.Header;
  * @author mario.arias, Eugen
  * 
  */
-public interface Dictionary extends Closeable {
+public interface CustomDictionary extends Closeable {
 
 
 	/**
@@ -99,9 +99,7 @@ public interface Dictionary extends Closeable {
 	
 	public DictionarySection getPredicates();
 	
-	public DictionarySection getObjects();
-
-	public HashMap<String,DictionarySection> getAllObjects();
+	public HashMap<String,DictionarySection> getObjects();
 	
 	public DictionarySection getShared();
 	

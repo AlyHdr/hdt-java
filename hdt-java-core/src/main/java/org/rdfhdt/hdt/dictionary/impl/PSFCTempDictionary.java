@@ -6,6 +6,7 @@ import org.rdfhdt.hdt.enums.TripleComponentRole;
 import org.rdfhdt.hdt.triples.TempTriples;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 public class PSFCTempDictionary implements TempDictionary {
     private final TempDictionary delegate;
@@ -27,6 +28,12 @@ public class PSFCTempDictionary implements TempDictionary {
     @Override public TempDictionarySection getSubjects() { return delegate.getSubjects(); }
     @Override public TempDictionarySection getPredicates() { return delegate.getPredicates(); }
     @Override public TempDictionarySection getObjects() { return delegate.getObjects(); }
+
+    @Override
+    public HashMap<String, TempDictionarySection> getAllObjects() {
+        return delegate.getAllObjects();
+    }
+
     @Override public TempDictionarySection getShared() { return delegate.getShared(); }
     @Override public void startProcessing() { delegate.startProcessing(); }
     @Override public void endProcessing() { delegate.endProcessing(); }

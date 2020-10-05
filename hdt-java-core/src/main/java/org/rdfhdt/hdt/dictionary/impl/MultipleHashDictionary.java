@@ -27,34 +27,47 @@
 
 package org.rdfhdt.hdt.dictionary.impl;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-
+import org.rdfhdt.hdt.dictionary.DictionarySectionPrivate;
 import org.rdfhdt.hdt.dictionary.TempDictionarySection;
 import org.rdfhdt.hdt.dictionary.impl.section.HashDictionarySection;
+import org.rdfhdt.hdt.dictionary.impl.section.PFCDictionarySection;
 import org.rdfhdt.hdt.enums.TripleComponentRole;
 import org.rdfhdt.hdt.options.HDTOptions;
 import org.rdfhdt.hdt.triples.TempTriples;
-import org.rdfhdt.hdt.triples.TripleID;
 import org.rdfhdt.hdt.util.StopWatch;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author mario.arias, Eugen
  *
  */
-public class HashDictionary extends BaseTempDictionary {
+public class MultipleHashDictionary extends MultipleBaseTempDictionary {
 
-	public HashDictionary(HDTOptions spec) {
+	public MultipleHashDictionary(HDTOptions spec) {
 		super(spec);
 		
 		// FIXME: Read types from spec
 		subjects = new HashDictionarySection();
 		predicates = new HashDictionarySection();
-		objects = new HashDictionarySection();
+		objects = new HashMap<>();
 		shared = new HashDictionarySection();
 	}
-	
+
+	private long getNumberObjectsAllSections(){
+		Iterator hmIterator = objects.entrySet().iterator();
+		// iterate over all subsections in the objects section
+		long total = 0;
+		while (hmIterator.hasNext()){
+			Map.Entry entry = (Map.Entry)hmIterator.next();
+			HashDictionarySection subSection = (HashDictionarySection) entry.getValue();
+			total += subSection.getNumberOfElements();
+		}
+		return total;
+	}
 	/* (non-Javadoc)
 	 * @see hdt.dictionary.Dictionary#reorganize(hdt.triples.TempTriples)
 	 */
@@ -62,7 +75,7 @@ public class HashDictionary extends BaseTempDictionary {
 	public void reorganize(TempTriples triples) {
 		DictionaryIDMapping mapSubj = new DictionaryIDMapping(subjects.getNumberOfElements());
 		DictionaryIDMapping mapPred = new DictionaryIDMapping(predicates.getNumberOfElements());
-		DictionaryIDMapping mapObj = new DictionaryIDMapping(objects.getNumberOfElements());
+		DictionaryIDMapping mapObj = new DictionaryIDMapping(getNumberObjectsAllSections());
 		
 		StopWatch st = new StopWatch();
 		
@@ -73,7 +86,7 @@ public class HashDictionary extends BaseTempDictionary {
 			mapSubj.add(str);
 			
 			// GENERATE SHARED at the same time
-			if(str.length()>0 && str.charAt(0)!='"' && objects.locate(str)!=0) {
+			if(str.length()>0 && str.charAt(0)!='"' && getSubSection(str) != null && getSubSection(str).locate(str)!=0) {
 				shared.add(str);
 			}
 		}
@@ -88,18 +101,22 @@ public class HashDictionary extends BaseTempDictionary {
 		}		
 		
 		// Generate old object mapping
-		Iterator<? extends CharSequence> itObj = ((TempDictionarySection) objects).getEntries();
-		while(itObj.hasNext()) {
-			CharSequence str = itObj.next();
-			mapObj.add(str);
+		Iterator hmIterator = objects.entrySet().iterator();
+		// iterate over all subsections in the objects section
+		while (hmIterator.hasNext()){
+			Map.Entry entry = (Map.Entry) hmIterator.next();
+			Iterator<? extends CharSequence> itObj = ((TempDictionarySection) entry.getValue()).getEntries();
+			while(itObj.hasNext()) {
+				CharSequence str = itObj.next();
+				mapObj.add(str);
+			}
 		}
-		
 		// Remove shared from subjects and objects
 		Iterator<? extends CharSequence> itShared = ((TempDictionarySection) shared).getEntries();
 		while(itShared.hasNext()) {
 			CharSequence sharedStr = itShared.next();
 			subjects.remove(sharedStr);
-			objects.remove(sharedStr);
+			getSubSection(sharedStr).remove(sharedStr);
 		}
 		//System.out.println("Mapping generated in "+st.stopAndShow());
 		
@@ -107,7 +124,15 @@ public class HashDictionary extends BaseTempDictionary {
 		st.reset();
 		subjects.sort();
 		predicates.sort();
-		objects.sort();
+
+		hmIterator = objects.entrySet().iterator();
+		// iterate over all subsections in the objects section
+		while (hmIterator.hasNext()){
+			Map.Entry entry = (Map.Entry) hmIterator.next();
+			TempDictionarySection subSection = (TempDictionarySection)entry.getValue();
+			subSection.sort();
+		}
+
 		shared.sort();
 		//System.out.println("Sections sorted in "+ st.stopAndShow());
 		
@@ -138,7 +163,7 @@ public class HashDictionary extends BaseTempDictionary {
 	}
 
 	@Override
-	public HashMap<String, TempDictionarySection> getAllObjects() {
+	public TempDictionarySection getObjects() {
 		return null;
 	}
 
@@ -155,5 +180,24 @@ public class HashDictionary extends BaseTempDictionary {
 	@Override
 	public void close() throws IOException {
 		// Do nothing.
+	}
+
+	private TempDictionarySection getSubSection(CharSequence str){
+		if(str.toString().startsWith("\"")){
+			String dataType = "";
+			if(str.toString().contains("^")){
+				dataType = str.toString().split("\\^")[2];
+			}else{
+				dataType = "NO_DATATYPE";
+			}
+			return objects.get(dataType);
+		}else {
+			String key = "";
+			if(str.toString().startsWith("_"))
+				key = "BLANK";
+			else
+				key= "URI";
+			return objects.get(key);
+		}
 	}
 }

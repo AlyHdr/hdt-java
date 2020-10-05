@@ -90,7 +90,6 @@ public class TempHDTImporterOnePass implements TempHDTImporter {
         dictionary.startProcessing();
         parser.doParse(filename, baseUri, notation, appender);
         dictionary.endProcessing();
-		
 		// Reorganize both the dictionary and the triples
 		modHDT.reorganizeDictionary(listener);
 		modHDT.reorganizeTriples(listener);

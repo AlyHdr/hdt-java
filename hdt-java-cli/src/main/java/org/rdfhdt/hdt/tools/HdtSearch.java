@@ -30,6 +30,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.rdfhdt.hdt.exceptions.NotFoundException;
@@ -38,6 +39,7 @@ import org.rdfhdt.hdt.hdt.HDT;
 import org.rdfhdt.hdt.hdt.HDTManager;
 import org.rdfhdt.hdt.hdt.HDTVersion;
 import org.rdfhdt.hdt.listener.ProgressListener;
+import org.rdfhdt.hdt.options.HDTSpecification;
 import org.rdfhdt.hdt.triples.IteratorTripleString;
 import org.rdfhdt.hdt.triples.TripleString;
 import org.rdfhdt.hdt.util.StopWatch;
@@ -139,7 +141,9 @@ public class HdtSearch implements ProgressListener {
 		if(loadInMemory) {
 			hdt = HDTManager.loadIndexedHDT(hdtInput, this);
 		} else {
-			hdt= HDTManager.mapIndexedHDT(hdtInput, this);
+			HDTSpecification spec = new HDTSpecification();
+			//spec.setOptions("dictionary.type=dictionaryMultiObj");
+			hdt= HDTManager.mapIndexedHDT(hdtInput, this,spec);
 		}
 
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in, UTF_8));
@@ -190,6 +194,7 @@ public class HdtSearch implements ProgressListener {
 		JCommander com = new JCommander(hdtSearch, args);
 		com.setProgramName("hdtSearch");
 
+		hdtSearch.parameters.add("/home/alyhdr/Desktop/qa-company/example_hdt/index_big.hdt");
 		if (showVersion) {
 			System.out.println(HDTVersion.get_version_string("."));
 			System.exit(0);

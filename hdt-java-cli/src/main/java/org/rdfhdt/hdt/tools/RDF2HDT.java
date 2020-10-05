@@ -83,6 +83,7 @@ public class RDF2HDT implements ProgressListener {
 			spec = new HDTSpecification();
 		}
 		if(options!=null) {
+			System.out.println(options);
 			spec.setOptions(options);
 		}
 		if(baseURI==null) {
@@ -154,15 +155,17 @@ public class RDF2HDT implements ProgressListener {
 		RDF2HDT rdf2hdt = new RDF2HDT();
 		JCommander com = new JCommander(rdf2hdt, args);
 		com.setProgramName("rdf2hdt");
-	
+		rdf2hdt.parameters.add("/home/alyhdr/Desktop/qa-company/example_hdt/index_big.ttl");
+		rdf2hdt.parameters.add("/home/alyhdr/Desktop/qa-company/example_hdt/index_big.hdt");
+		rdf2hdt.parameters.add("tempDictionary.impl=multHash;dictionary.type=dictionaryMultiObj;loader.type=two-pass");
 		if(rdf2hdt.parameters.size()==1) {
 			System.err.println("No input file specified, reading from standard input.");
 			rdf2hdt.rdfInput = "-";
 			rdf2hdt.hdtOutput = rdf2hdt.parameters.get(0);
-		} else if(rdf2hdt.parameters.size()==2) {
+		} else if(rdf2hdt.parameters.size() >= 2) {
 			rdf2hdt.rdfInput = rdf2hdt.parameters.get(0);
 			rdf2hdt.hdtOutput = rdf2hdt.parameters.get(1);
-			
+			rdf2hdt.options = rdf2hdt.parameters.get(2);
 		} else if (showVersion){
 				System.out.println(HDTVersion.get_version_string("."));
 				System.exit(0);

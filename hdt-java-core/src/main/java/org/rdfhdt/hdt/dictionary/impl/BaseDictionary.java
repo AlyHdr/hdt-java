@@ -36,6 +36,8 @@ import org.rdfhdt.hdt.options.HDTOptions;
 import org.rdfhdt.hdt.util.string.CompactString;
 import org.rdfhdt.hdt.util.string.DelayedString;
 
+import java.util.HashMap;
+
 /**
  * 
  * This abstract class implements all general methods that are the same
@@ -182,7 +184,12 @@ public abstract class BaseDictionary implements DictionaryPrivate {
 	public DictionarySection getObjects() {
 		return objects;
 	}
-	
+
+	@Override
+	public HashMap<String, DictionarySection> getAllObjects() {
+		return null;
+	}
+
 	@Override
 	public DictionarySection getShared() {
 		return shared;

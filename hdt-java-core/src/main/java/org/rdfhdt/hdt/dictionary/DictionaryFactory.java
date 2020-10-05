@@ -27,11 +27,7 @@
 
 package org.rdfhdt.hdt.dictionary;
 
-import org.rdfhdt.hdt.dictionary.impl.FourSectionDictionary;
-import org.rdfhdt.hdt.dictionary.impl.FourSectionDictionaryBig;
-import org.rdfhdt.hdt.dictionary.impl.HashDictionary;
-import org.rdfhdt.hdt.dictionary.impl.PSFCFourSectionDictionary;
-import org.rdfhdt.hdt.dictionary.impl.PSFCTempDictionary;
+import org.rdfhdt.hdt.dictionary.impl.*;
 import org.rdfhdt.hdt.exceptions.IllegalFormatException;
 import org.rdfhdt.hdt.hdt.HDTVocabulary;
 import org.rdfhdt.hdt.options.ControlInfo;
@@ -45,9 +41,10 @@ import org.rdfhdt.hdt.options.HDTSpecification;
 public class DictionaryFactory {
 
 	public static final String MOD_DICT_IMPL_HASH = "hash";
+	public static final String MOD_DICT_IMPL_MULT_HASH = "multHash";
 	public static final String MOD_DICT_IMPL_HASH_PSFC = "hashPsfc";
 	public static final String DICTIONARY_TYPE_FOUR_SECTION_BIG ="dictionaryFourBig";
-
+	public static final String DICTIONARY_TYPE_MULTI_OBJECTS = "dictionaryMultiObj";
 	private DictionaryFactory() {}
 
 	/**
@@ -73,6 +70,8 @@ public class DictionaryFactory {
 			return new HashDictionary(spec);
 		} else if(MOD_DICT_IMPL_HASH_PSFC.equals(name)){
 			return new PSFCTempDictionary(new HashDictionary(spec));
+		} else if(MOD_DICT_IMPL_MULT_HASH.equals(name)){
+			return new MultipleHashDictionary(spec);
 		}
 		throw new IllegalFormatException("Implementation of triples not found for "+name);
 	}
@@ -87,6 +86,8 @@ public class DictionaryFactory {
 		}
 		else if (DICTIONARY_TYPE_FOUR_SECTION_BIG.equals(name)){
 			return new FourSectionDictionaryBig(spec);
+		}else if ((DICTIONARY_TYPE_MULTI_OBJECTS.equals(name))){
+			return new MultipleSectionDictionary(spec);
 		}
 		throw new IllegalFormatException("Implementation of dictionary not found for "+name);
 	}
@@ -97,6 +98,8 @@ public class DictionaryFactory {
 			return new FourSectionDictionary(new HDTSpecification());
 		} else if (HDTVocabulary.DICTIONARY_TYPE_FOUR_PSFC_SECTION.equals(name)) {
 			return new PSFCFourSectionDictionary(new HDTSpecification());
+		} else if(HDTVocabulary.DICTIONARY_TYPE_MULT_SECTION.equals(name)){
+			return new MultipleSectionDictionary(new HDTSpecification());
 		}
 		throw new IllegalFormatException("Implementation of dictionary not found for "+name);
 	}
